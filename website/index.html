@@ -1,0 +1,339 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>wtop · Task Manager style system monitor for the Linux terminal</title>
+  <meta name="description" content="wtop is a Windows Task Manager style take on top: a system monitor for the Linux terminal with per-resource screens, 60-second braille graphs and tmux-style tabs. Written in C++20 with no dependencies.">
+  <meta name="theme-color" content="#1a0f1e">
+  <meta property="og:title" content="wtop">
+  <meta property="og:description" content="A Task Manager style system monitor for the Linux terminal. C++20, no dependencies.">
+  <meta property="og:image" content="assets/wtop-demo-poster.jpg">
+  <meta property="og:type" content="website">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+
+  <header class="nav">
+    <div class="wrap nav-inner">
+      <a class="logo" href="#top" aria-label="wtop home"><span class="prompt">$</span> wtop<span class="cursor" aria-hidden="true">_</span></a>
+      <nav aria-label="Main">
+        <ul class="nav-links">
+          <li><a href="#features">Features</a></li>
+          <li><a href="#install">Install</a></li>
+          <li><a href="#usage">Usage</a></li>
+          <li><a href="#keys">Keys</a></li>
+          <li><a href="#faq">Docs</a></li>
+          <li><a class="gh" href="https://github.com/tomjnet/wtop">GitHub</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <!-- Hero -->
+    <section class="hero" id="top">
+      <div class="wrap">
+        <p class="eyebrow"><span class="dot"></span> v0.1.0 · Linux · C++20</p>
+        <h1>The Windows Task Manager look, in your <span class="accent">Linux terminal</span>.</h1>
+        <p class="lead">
+          <strong>wtop</strong> is a <em>Task Manager style</em> take on <code>top</code>:
+          one screen per resource, a 60-second braille history graph, a statistics panel,
+          and tmux-style tabs. A single static binary with no ncurses and no third-party
+          runtime dependencies.
+        </p>
+
+        <div class="install-box" role="group" aria-label="Install command">
+          <span class="ps1" aria-hidden="true">$</span>
+          <code id="hero-cmd">curl -fsSL https://raw.githubusercontent.com/tomjnet/wtop/HEAD/install.sh | bash</code>
+          <button class="copy" data-copy="#hero-cmd" aria-label="Copy install command">Copy</button>
+        </div>
+        <p class="hint">No root, no compiler needed. Installs to <code>~/.local/bin</code>. <a href="#install">Other ways to install →</a></p>
+
+        <div class="cta">
+          <a class="btn primary" href="https://github.com/tomjnet/wtop/releases/latest">Download release</a>
+          <a class="btn" href="https://github.com/tomjnet/wtop">View source</a>
+        </div>
+
+        <figure class="term">
+          <div class="term-bar" aria-hidden="true">
+            <span class="tl r"></span><span class="tl y"></span><span class="tl g"></span>
+            <span class="term-title">wtop</span>
+          </div>
+          <video width="1280" height="720" poster="assets/wtop-demo-poster.jpg"
+                 data-poster-mobile="assets/wtop-demo-mobile-poster.jpg"
+                 autoplay muted loop playsinline controls preload="metadata"
+                 aria-label="wtop demo: switching between the CPU, memory, disk, Wi-Fi and GPU screens, each with a resource sidebar, a braille history graph and statistics below it.">
+            <!-- Phones get a version cropped to the terminal window so the text stays readable. -->
+            <source src="assets/wtop-demo-mobile.mp4" type="video/mp4" media="(max-width: 640px)">
+            <source src="assets/wtop-demo.mp4" type="video/mp4">
+            <p>Your browser can't play this video. <a href="assets/wtop-demo.mp4">Download the wtop demo (MP4)</a>.</p>
+          </video>
+        </figure>
+      </div>
+    </section>
+
+    <!-- Features -->
+    <section id="features" class="section">
+      <div class="wrap">
+        <h2><span class="hash">#</span> Features</h2>
+        <div class="grid">
+          <article class="card">
+            <div class="icon" aria-hidden="true">⣿⣷⣄</div>
+            <h3>Braille history graphs</h3>
+            <p>Every resource gets a smooth 60-second graph drawn with braille glyphs and 24-bit color, just like the Performance page.</p>
+          </article>
+          <article class="card">
+            <div class="icon" aria-hidden="true">[0:1:2]</div>
+            <h3>Tabs, tmux style</h3>
+            <p>Each screen is a tab. Switch with <kbd>Ctrl</kbd>+<kbd>b</kbd> then <kbd>n</kbd>, <kbd>p</kbd>, a number or <kbd>w</kbd> for a picker.</p>
+          </article>
+          <article class="card">
+            <div class="icon" aria-hidden="true">▌▌▌</div>
+            <h3>Live resource sidebar</h3>
+            <p>On wide terminals a Task Manager style sidebar lists every CPU, disk, adapter and GPU with a mini live graph.</p>
+          </article>
+          <article class="card">
+            <div class="icon" aria-hidden="true">0 deps</div>
+            <h3>Zero dependencies</h3>
+            <p>Pure C++20 standard library and POSIX. No ncurses. Release binaries are fully static and run on any glibc or musl distro.</p>
+          </article>
+          <article class="card">
+            <div class="icon" aria-hidden="true">GPU</div>
+            <h3>NVIDIA, AMD &amp; Intel GPUs</h3>
+            <p>NVIDIA through <code>nvidia-smi</code> on a background thread; amdgpu, i915 and xe straight from <code>/sys/class/drm</code>.</p>
+          </article>
+          <article class="card">
+            <div class="icon" aria-hidden="true">--snap</div>
+            <h3>Scriptable snapshots</h3>
+            <p><code>wtop --snapshot</code> prints every tab once as plain text, handy for scripts and bug reports.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Screens -->
+    <section id="screens" class="section alt">
+      <div class="wrap">
+        <h2><span class="hash">#</span> One screen per resource</h2>
+        <p class="sub">Just like the Performance page of the Windows Task Manager.</p>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr><th>Screen</th><th>Graph(s)</th><th>Statistics</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><span class="tag c1">CPU</span></td><td>% utilization</td><td>Utilization, speed, processes, threads, load average, up time, sockets, cores, caches</td></tr>
+              <tr><td><span class="tag c2">Memory</span></td><td>Memory usage + composition bar</td><td>In use, available, committed, cached, slab, buffers, shared, swap</td></tr>
+              <tr><td><span class="tag c3">Disk N</span></td><td>Active time, transfer rate (read / write)</td><td>Active time, response time, read/write speed, capacity, formatted, system disk, swap, mounts</td></tr>
+              <tr><td><span class="tag c4">Network</span></td><td>Throughput (receive / send)</td><td>Send/receive rates, link speed, IPv4/IPv6, MAC, Wi-Fi signal, totals</td></tr>
+              <tr><td><span class="tag c5">GPU N</span></td><td>Utilization, dedicated memory</td><td>Memory, temperature, clock, power, encoder/decoder, driver, PCI location</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Install -->
+    <section id="install" class="section">
+      <div class="wrap">
+        <h2><span class="hash">#</span> Install</h2>
+        <p class="sub">Linux on x86_64 or aarch64. The installer downloads the latest static release binary, verifies its SHA-256 checksum, and falls back to a source build when no binary fits.</p>
+
+        <div class="tabs" data-tabs>
+          <div class="tab-list" role="tablist" aria-label="Install methods">
+            <button role="tab" id="t-quick" aria-controls="p-quick" aria-selected="true">Quick install</button>
+            <button role="tab" id="t-review" aria-controls="p-review" aria-selected="false" tabindex="-1">Review first</button>
+            <button role="tab" id="t-source" aria-controls="p-source" aria-selected="false" tabindex="-1">From source</button>
+            <button role="tab" id="t-verify" aria-controls="p-verify" aria-selected="false" tabindex="-1">Verify</button>
+            <button role="tab" id="t-uninstall" aria-controls="p-uninstall" aria-selected="false" tabindex="-1">Uninstall</button>
+          </div>
+
+          <div class="tab-panel" role="tabpanel" id="p-quick" aria-labelledby="t-quick">
+            <pre class="code"><button class="copy" aria-label="Copy">Copy</button><code><span class="c"># latest release, into ~/.local</span>
+curl -fsSL https://raw.githubusercontent.com/tomjnet/wtop/HEAD/install.sh | bash
+
+<span class="c"># a specific version</span>
+curl -fsSL https://raw.githubusercontent.com/tomjnet/wtop/HEAD/install.sh | bash -s -- --ref v0.1.0
+
+<span class="c"># make sure ~/.local/bin is on your PATH</span>
+echo 'export PATH="$HOME/.local/bin:$PATH"' &gt;&gt; ~/.bashrc</code></pre>
+          </div>
+
+          <div class="tab-panel" role="tabpanel" id="p-review" aria-labelledby="t-review" hidden>
+            <pre class="code"><button class="copy" aria-label="Copy">Copy</button><code><span class="c"># read the script before running it (a good habit)</span>
+curl -fsSLO https://raw.githubusercontent.com/tomjnet/wtop/HEAD/install.sh
+less install.sh
+bash install.sh</code></pre>
+          </div>
+
+          <div class="tab-panel" role="tabpanel" id="p-source" aria-labelledby="t-source" hidden>
+            <pre class="code"><button class="copy" aria-label="Copy">Copy</button><code><span class="c"># Ubuntu 24.04 / Debian 13: GCC 13+ or Clang 17+, CMake 3.20+</span>
+sudo apt-get install -y git cmake g++ make
+
+git clone https://github.com/tomjnet/wtop.git
+cd wtop
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+cmake --build build -j
+ctest --test-dir build --output-on-failure
+
+<span class="c"># user install (no root) or system-wide</span>
+cmake --install build --prefix ~/.local --strip
+sudo cmake --install build --strip</code></pre>
+          </div>
+
+          <div class="tab-panel" role="tabpanel" id="p-verify" aria-labelledby="t-verify" hidden>
+            <pre class="code"><button class="copy" aria-label="Copy">Copy</button><code><span class="c"># checksums and signed build provenance from GitHub Actions</span>
+sha256sum -c SHA256SUMS --ignore-missing
+gh attestation verify wtop-linux-x86_64.tar.gz -R tomjnet/wtop</code></pre>
+          </div>
+
+          <div class="tab-panel" role="tabpanel" id="p-uninstall" aria-labelledby="t-uninstall" hidden>
+            <pre class="code"><button class="copy" aria-label="Copy">Copy</button><code>curl -fsSL https://raw.githubusercontent.com/tomjnet/wtop/HEAD/install.sh | bash -s -- --uninstall</code></pre>
+          </div>
+        </div>
+
+        <details class="more">
+          <summary>Installer options</summary>
+          <div class="table-scroll">
+            <table class="compact">
+              <thead><tr><th>Option</th><th>Description</th></tr></thead>
+              <tbody>
+                <tr><td><code>--prefix DIR</code></td><td>Install under <code>DIR</code> instead of <code>~/.local</code></td></tr>
+                <tr><td><code>--ref REF</code></td><td>Release tag such as <code>v0.1.0</code> (default: latest); a branch name builds from source</td></tr>
+                <tr><td><code>--binary</code></td><td>Only install a pre-built binary, never build</td></tr>
+                <tr><td><code>--from-source</code></td><td>Always clone and build from source</td></tr>
+                <tr><td><code>--repo URL</code></td><td>Git repository to clone</td></tr>
+                <tr><td><code>--source DIR</code></td><td>Build from an existing local checkout</td></tr>
+                <tr><td><code>--jobs N</code></td><td>Parallel build jobs (default: number of CPUs)</td></tr>
+                <tr><td><code>--with-tests</code></td><td>Build from source and run the unit tests</td></tr>
+                <tr><td><code>--check</code></td><td>Only check what is needed</td></tr>
+                <tr><td><code>--uninstall</code></td><td>Remove wtop from the prefix</td></tr>
+                <tr><td><code>--keep</code></td><td>Keep the temporary directory</td></tr>
+                <tr><td><code>--verbose</code></td><td>Show the full git, CMake and compiler output</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="small"><code>WTOP_PREFIX</code>, <code>WTOP_REF</code> and <code>WTOP_REPO</code> set the same defaults from the environment, <code>WTOP_RELEASES_URL</code> points downloads at a mirror, and <code>CXX</code> picks the compiler to try first.</p>
+        </details>
+      </div>
+    </section>
+
+    <!-- Usage -->
+    <section id="usage" class="section alt">
+      <div class="wrap two-col">
+        <div>
+          <h2><span class="hash">#</span> Usage</h2>
+          <p class="sub">Start it and go. Everything else is optional.</p>
+          <pre class="code"><code><span class="p">$</span> wtop --help
+wtop [options]
+
+  -d, --delay &lt;ms&gt;       Refresh interval in milliseconds
+                         (default 1000, min 100)
+  -t, --tab &lt;n&gt;          Tab to open first (0 = CPU, 1 = Memory, ...)
+  -s, --snapshot [WxH]   Print every tab once as plain text and exit
+  -h, --help             Show help and exit
+  -v, --version          Show the version and license and exit</code></pre>
+        </div>
+        <div>
+          <h3 class="mt">Examples</h3>
+          <pre class="code"><button class="copy" aria-label="Copy">Copy</button><code><span class="c"># refresh twice a second, open on Memory</span>
+wtop -d 500 -t 1
+
+<span class="c"># plain-text dump for a bug report</span>
+wtop --snapshot 120x40 &gt; wtop.txt
+
+<span class="c"># full manual</span>
+man wtop</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- Keys -->
+    <section id="keys" class="section">
+      <div class="wrap">
+        <h2><span class="hash">#</span> Key bindings</h2>
+        <p class="sub">Function keys work like htop. Tabs are switched tmux-style: press the prefix <kbd>Ctrl</kbd>+<kbd>b</kbd>, release, then a command key. While the prefix is pending the status line shows <code>^B</code>.</p>
+        <div class="keys">
+          <div class="key-group">
+            <h3>htop style</h3>
+            <dl>
+              <div><dt><kbd>F1</kbd></dt><dd>Show / hide key bindings</dd></div>
+              <div><dt><kbd>F10</kbd></dt><dd>Quit</dd></div>
+            </dl>
+          </div>
+          <div class="key-group">
+            <h3>tmux style · prefix <kbd>C-b</kbd></h3>
+            <dl>
+              <div><dt><kbd>n</kbd></dt><dd>Next tab</dd></div>
+              <div><dt><kbd>p</kbd></dt><dd>Previous tab</dd></div>
+              <div><dt><kbd>←</kbd> <kbd>→</kbd></dt><dd>Previous / next tab</dd></div>
+              <div><dt><kbd>0</kbd>…<kbd>9</kbd></dt><dd>Go to tab by number</dd></div>
+              <div><dt><kbd>l</kbd></dt><dd>Last used tab</dd></div>
+              <div><dt><kbd>w</kbd></dt><dd>Choose a tab from a list (<kbd>j</kbd>/<kbd>k</kbd>, <kbd>Enter</kbd>)</dd></div>
+              <div><dt><kbd>?</kbd></dt><dd>Show key bindings</dd></div>
+              <div><dt><kbd>d</kbd> <kbd>q</kbd></dt><dd>Quit (also <kbd>Ctrl</kbd>+<kbd>c</kbd>)</dd></div>
+            </dl>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Sources / docs -->
+    <section id="faq" class="section alt">
+      <div class="wrap">
+        <h2><span class="hash">#</span> Where the numbers come from</h2>
+        <p class="sub">Everything is read directly from the kernel. Nothing is sent anywhere.</p>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th>Resource</th><th>Source</th></tr></thead>
+            <tbody>
+              <tr><td>CPU</td><td><code>/proc/stat</code>, <code>/proc/cpuinfo</code>, <code>/sys/devices/system/cpu</code>, <code>/proc/loadavg</code>, <code>/proc/uptime</code></td></tr>
+              <tr><td>Memory</td><td><code>/proc/meminfo</code></td></tr>
+              <tr><td>Disk</td><td><code>/proc/diskstats</code>, <code>/sys/block</code>, <code>/proc/mounts</code> + <code>statvfs()</code>, <code>/proc/swaps</code></td></tr>
+              <tr><td>Network</td><td><code>/proc/net/dev</code>, <code>/sys/class/net</code>, <code>getifaddrs()</code>, <code>/proc/net/wireless</code></td></tr>
+              <tr><td>GPU</td><td><code>nvidia-smi</code> (background thread) or <code>/sys/class/drm</code> for amdgpu / i915 / xe</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="small">A few Task Manager fields map to their closest Linux equivalents: <em>Handles</em> becomes the load average, <em>Paged / Non-paged pool</em> become reclaimable / unreclaimable slab, <em>Page file</em> becomes swap, and <em>Committed</em> is <code>Committed_AS</code> against RAM + swap.</p>
+
+        <h3 class="mt">Requirements</h3>
+        <ul class="reqs">
+          <li><span class="ok">✓</span> Linux (reads <code>/proc</code> and <code>/sys</code>)</li>
+          <li><span class="ok">✓</span> A terminal with 24-bit color and UTF-8</li>
+          <li><span class="ok">✓</span> To build: GCC 13+ or Clang 17+, CMake 3.20+</li>
+          <li><span class="opt">○</span> Optional: <code>nvidia-smi</code>, <code>pci.ids</code> (hwdata / pciutils)</li>
+        </ul>
+
+        <div class="links">
+          <a href="https://github.com/tomjnet/wtop#readme">README</a>
+          <a href="https://github.com/tomjnet/wtop/blob/main/CHANGELOG.md">Changelog</a>
+          <a href="https://github.com/tomjnet/wtop/blob/main/CONTRIBUTING.md">Contributing</a>
+          <a href="https://github.com/tomjnet/wtop/issues">Issues</a>
+          <a href="https://github.com/tomjnet/wtop/releases">Releases</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="statusline wrap" aria-hidden="true">
+      <span class="sl-left">[wtop] <b>0:site*</b></span>
+      <span class="sl-mid">C-b n/p:switch &nbsp; C-b w:list &nbsp; q:quit</span>
+      <span class="sl-right">"github.com/tomjnet/wtop"</span>
+    </div>
+    <div class="wrap foot">
+      <p>wtop is released under the <a href="https://github.com/tomjnet/wtop/blob/main/LICENSE.md">MIT License</a>. © 2026 Tom J.</p>
+      <p class="muted">Not affiliated with Microsoft. “Task Manager” is used only to describe the look.</p>
+    </div>
+  </footer>
+
+  <script src="main.js" defer></script>
+</body>
+</html>

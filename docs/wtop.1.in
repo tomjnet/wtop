@@ -1,0 +1,148 @@
+.TH WTOP 1 "2026-09-29" "wtop @PROJECT_VERSION@" "User Commands"
+.SH NAME
+wtop \- a Windows Task Manager style top for the terminal
+.SH SYNOPSIS
+.B wtop
+[\fB\-d\fR \fIms\fR]
+[\fB\-t\fR \fIn\fR]
+[\fB\-s\fR [\fIW\fBx\fIH\fR]]
+.br
+.B wtop
+\fB\-h\fR | \fB\-v\fR
+.SH DESCRIPTION
+.B wtop
+is an interactive system monitor modelled on the
+.I Performance
+page of the Windows Task Manager: the \(lqw\(rq stands for the Windows
+Task Manager look and \(lqtop\(rq for the classic Unix command.
+.PP
+Each resource has its own screen (tab) with a 60\-second history graph
+and a statistics panel:
+.TP
+.B CPU
+Utilization, current and base speed, processes, threads, load average,
+up time, sockets, cores, logical processors and cache sizes.
+.TP
+.B Memory
+Memory usage graph, composition bar (in use, modified, standby, free),
+available, committed, cached, slab, buffers, shared memory and swap.
+.TP
+.B Disk N
+Active time and transfer rate graphs, average response time, read and
+write speed, capacity, formatted size, system disk, swap and mount points.
+.TP
+.B Network
+Receive and send throughput, link speed, IPv4 and IPv6 addresses, MAC
+address, Wi\-Fi signal strength and total bytes transferred.
+.TP
+.B GPU N
+Utilization and dedicated memory graphs, temperature, clock speed,
+power, video encoder and decoder load, driver and PCI location.
+.PP
+A tab line at the top lists every screen, a tmux\-style status line and an
+htop\-style function key bar sit at the bottom, and on wide terminals a
+sidebar shows every resource with a live mini graph.
+.PP
+.B wtop
+runs on Linux only.
+.SH OPTIONS
+.TP
+\fB\-d\fR, \fB\-\-delay\fR \fIms\fR
+Refresh interval in milliseconds. Default 1000, minimum 100.
+.TP
+\fB\-t\fR, \fB\-\-tab\fR \fIn\fR
+Open tab number \fIn\fR first (0 is CPU, 1 is Memory, ...).
+.TP
+\fB\-s\fR, \fB\-\-snapshot\fR [\fIW\fBx\fIH\fR]
+Print every tab once as plain text and exit. The size defaults to the
+terminal size, or 120x40 when the output is not a terminal.
+.TP
+\fB\-h\fR, \fB\-\-help\fR
+Print a usage summary and exit.
+.TP
+\fB\-v\fR, \fB\-\-version\fR
+Print the version and license and exit.
+.SH INTERACTIVE COMMANDS
+Function keys work like in
+.BR htop (1):
+.TP
+.B F1
+Show or hide the key binding help.
+.TP
+.B F10
+Quit.
+.PP
+Tabs are switched with
+.BR tmux (1)\-style
+bindings: press the prefix \fBCtrl+b\fR, release it, then press a command
+key. The status line shows \fB^B\fR while the prefix is pending.
+.TP
+.B C\-b n\fR, \fBC\-b p
+Next, previous tab.
+.TP
+.B C\-b Left\fR, \fBC\-b Right
+Previous, next tab.
+.TP
+.B C\-b 0\fR ... \fB9
+Go to the tab with that number.
+.TP
+.B C\-b l
+Go back to the last used tab.
+.TP
+.B C\-b w
+Choose a tab from a list; move with \fBj\fR/\fBk\fR or the arrow keys,
+select with \fBEnter\fR, close with \fBEsc\fR.
+.TP
+.B C\-b ?
+Show the key binding help.
+.TP
+.B C\-b d\fR, \fBq\fR, \fBCtrl+c
+Quit.
+.SH FILES
+.TP
+.I /proc/stat\fR, \fI/proc/cpuinfo\fR, \fI/proc/loadavg\fR, \fI/proc/uptime
+CPU statistics.
+.TP
+.I /proc/meminfo
+Memory statistics.
+.TP
+.I /proc/diskstats\fR, \fI/sys/block\fR, \fI/proc/mounts\fR, \fI/proc/swaps
+Disk statistics and layout.
+.TP
+.I /proc/net/dev\fR, \fI/sys/class/net\fR, \fI/proc/net/wireless
+Network statistics.
+.TP
+.I /sys/class/drm
+AMD and Intel GPU statistics.
+.TP
+.I /usr/share/hwdata/pci.ids\fR, \fI/usr/share/misc/pci.ids
+Optional PCI name database for readable adapter and GPU names.
+.SH NOTES
+NVIDIA GPUs are read through
+.BR nvidia\-smi (1),
+which must be on the \fBPATH\fR; it is queried on a background thread.
+.PP
+The terminal needs 24\-bit color and UTF\-8 support; graphs are drawn with
+braille characters. The minimum size is 60x20.
+.SH EXIT STATUS
+0 on success, 1 when standard input or output is not a terminal, 2 on
+invalid command line arguments.
+.SH EXAMPLES
+.TP
+.B wtop \-d 500
+Refresh twice per second.
+.TP
+.B wtop \-t 1
+Start on the Memory tab.
+.TP
+.B wtop \-\-snapshot 120x40 > report.txt
+Save a plain text report of every screen.
+.SH SEE ALSO
+.BR top (1),
+.BR htop (1),
+.BR tmux (1),
+.BR proc (5)
+.SH AUTHOR
+Tom J.
+.SH LICENSE
+MIT.

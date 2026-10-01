@@ -1,0 +1,99 @@
+# Continuous integration: builds and tests every push and pull request to
+# main and develop.
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# A newer push to the same branch cancels the run in progress.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-test:
+    name: Build & test (${{ matrix.name }})
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: GCC 13
+            cxx: g++-13
+            build_type: Release
+          - name: GCC 14
+            cxx: g++-14
+            build_type: Release
+          - name: Clang 18
+            cxx: clang++-18
+            build_type: Release
+          - name: GCC 14, ASan + UBSan
+            cxx: g++-14
+            build_type: Debug
+            flags: -fsanitize=address,undefined -fno-sanitize-recover=all -fno-omit-frame-pointer
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Configure
+        run: >
+          cmake -S . -B build
+          -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+          -DCMAKE_CXX_COMPILER=${{ matrix.cxx }}
+          -DCMAKE_CXX_FLAGS="${{ matrix.flags }}"
+
+      - name: Build
+        run: cmake --build build --parallel
+
+      - name: Unit tests
+        run: ctest --test-dir build --output-on-failure
+
+      - name: Smoke test
+        run: |
+          ./build/wtop --version
+          ./build/wtop --help > /dev/null
+          ./build/wtop --snapshot 120x40 | tee snapshot.txt | head -n 40
+          grep -q "% Utilization" snapshot.txt
+          grep -q "Memory usage" snapshot.txt
+
+  format:
+    name: clang-format
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - name: Check formatting (clang-format 22)
+        run: |
+          pipx run --spec clang-format==22.1.8 clang-format --version
+          git ls-files '*.h' '*.cc' \
+            | xargs pipx run --spec clang-format==22.1.8 clang-format --dry-run --Werror
+
+  installer:
+    name: install.sh
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Lint
+        run: |
+          bash -n install.sh
+          pipx run --spec shellcheck-py==0.11.0.1 shellcheck --version
+          pipx run --spec shellcheck-py==0.11.0.1 shellcheck install.sh
+
+      - name: Dependency check
+        run: bash install.sh --check
+
+      - name: Install from this checkout into a temporary prefix
+        run: |
+          prefix="$RUNNER_TEMP/wtop"
+          bash install.sh --from-source --source . --prefix "$prefix"
+          "$prefix/bin/wtop" --version
+          test -f "$prefix/share/man/man1/wtop.1"
+          MANPATH="$prefix/share/man" man -w wtop
+          bash install.sh --uninstall --prefix "$prefix"
+          test ! -e "$prefix/bin/wtop"
